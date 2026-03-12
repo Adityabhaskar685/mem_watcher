@@ -8,3 +8,4 @@ clap = { version = "4.0", features = ["derive"] }
 tabled = "0.15"
 serde = { version  = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
+sysconf = "0.3"
