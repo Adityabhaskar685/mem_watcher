@@ -6,7 +6,7 @@ use tabled::Tabled;
 
 /// Fully Resolved, display-ready information for one process or thread. 
 /// This is the data contract detween 'proc' and 'display'
-#[derive(Tabled, Debug)]
+#[derive(Tabled, Debug, Clone)]
 pub struct ProcessInfo {
     #[tabled(rename = "PID")]
     pub pid: String,
@@ -32,6 +32,13 @@ pub struct ProcessInfo {
     pub cpu_time: String,
     #[tabled(rename = "UPTIME")]
     pub uptime: String,
+}
+
+/// Minimal entry used by the TUI process-selector screen.
+#[derive(Debug, Clone)]
+pub struct ProcessEntry {
+    pub pid: i32,
+    pub name: String
 }
 
 /// Raw field parsed from `/proc/{pid}/stat`
@@ -80,6 +87,33 @@ impl CpuStats {
             system_info,
         })
     }
+}
+
+/// Returns every readable process on the system, sorted by name. 
+/// Used by the TUI selector. Processes that can't be read are silently
+/// skipped (permission error, processes that exit mid-scan).
+pub fn list_all_processes() -> Vec<ProcessEntry> {
+    let mut entries = Vec::new();
+    
+    let Ok(dir) = fs::read_dir("/proc") else {
+        return entries;
+    };
+    
+    for entry in dir.flatten() {
+        // /proc contains many non-PID entries; skip anything non-numeric. 
+        let Ok(pid) = entry.file_name().to_string_lossy().parse::<i32>() else {
+            continue;
+        };
+        if let Ok(stat) = read_proc_stat(pid) {
+            entries.push(ProcessEntry {
+                pid, 
+                name: stat.comm
+            });
+        }
+    }
+    
+    entries.sort_by(|a,b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    entries
 }
 
 /// Collect fresh `ProcessInfo` for every PID in `pids`

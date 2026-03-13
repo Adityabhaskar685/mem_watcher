@@ -128,7 +128,23 @@ CPU usage is computed as:
 On the first snapshot, a 200ms warm-up sample is taken automatically so the reading is never stuck at 0%.
  
 ---
- 
+
+## TUI Mode
+
+`mem_watcher` also includes an interactive TUI for selecting and monitoring processes visually.
+
+![TUI](tui.png)
+
+### Running the TUI
+
+```bash
+mem_watcher --tui
+```
+
+Press `Tab` to switch between the process selector and the monitor view. Use arrow keys to navigate, and `q` to quit.
+
+---
+
 ## Dependencies
  
 | Crate | Purpose |
@@ -137,6 +153,7 @@ On the first snapshot, a 200ms warm-up sample is taken automatically so the read
 | [`tabled`](https://crates.io/crates/tabled) | Terminal table rendering |
 | [`chrono`](https://crates.io/crates/chrono) | Timestamp formatting in continuous mode |
 | [`sysconf`](https://crates.io/crates/sysconf) | Reading `SC_CLK_TCK` and `SC_PAGESIZE` at startup |
+| [`ratatui`](https://crates.io/crates/ratatui) | TUI rendering |
  
 ---
  
